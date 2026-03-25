@@ -90,16 +90,16 @@ async function inserirPais(pais) {
     }
 }
 
-async function inserirCidade(cidade, pais) {
-    try {
-        Country.create({
-            Country: pais,
-            include: [City: {
-                cidade
-            }]
-        })
-    }
-}
+// async function inserirCidade(cidade, pais) {
+//     try {
+//         Country.create({
+//             Country: pais,
+//             include: [City: {
+//                 cidade
+//             }]
+//         })
+//     }
+// }
 module.exports = {
     listarPaises,
     listarCidades,

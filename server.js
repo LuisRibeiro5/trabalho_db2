@@ -5,6 +5,9 @@ app.use(cors()); // 2. Enable it for all routes
 const PORT = 3000; // Define the port number
 const {listarEnderecos, listarCidades, listarPaises} = require('./main')
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // Define a route for the home page (root URL)
 app.get('/listarTudo', (req, res) => {
   listarDadosCompletos2() // Call the listarTudo function from the main module
@@ -52,7 +55,10 @@ app.get('/listarEnderecos',async (req, res) => {
     console.error('Error:', error); // Log any errors to the console
     res.status(500).json({ error: 'An error occurred' }); // Send a 500 error response with a message
   }
+})
 
+app.post('/cadastrar_endereco', (req, res) => {
+  res.json(req.body);
 })
 
 
