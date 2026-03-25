@@ -6,29 +6,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criação de Endereços</title>
     <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f4f7f6;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+    
         body {
-            font-family: Arial;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
         }
-
-        form {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        input,
-        select,
-        button {
-            display: block;
-            margin: 5px 0 10px;
-            padding: 5px;
-            width: 250px;
-        }
-
+    
         h2 {
-            margin-top: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+    
+        form {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.2s;
+        }
+    
+        form:hover {
+            transform: translateY(-2px);
+        }
+    
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+    
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            box-sizing: border-box; /* Garante que o padding não aumente a largura */
+            font-size: 16px;
+            outline: none;
+        }
+    
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+    
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        button:hover {
+            background-color: #357abd;
+        }
+    
+        /* Título para separar os formulários visualmente */
+        .form-title {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
         }
     </style>
 </head>
@@ -65,11 +126,6 @@
         <label for="nome">Nome da Cidade:</label>
         <select id="cidade_endereco" name="cidade_endereco" required></select>
 
-        <label for="pais">Nome do país:</label>
-        <select id="pais_endereco" name="pais_endereco" required></select>
-
-
-
         <!-- Botão para submeter o formulário -->
         <button type="submit">Enviar</button>
     </form>
@@ -93,13 +149,11 @@
 
         function preencherSelectPaises(lista) {
             // 1. Use aspas para buscar pelo ID
-            const select = document.getElementById("pais_endereco");
-            const select2 = document.getElementById("pais_cidade");
+            const select = document.getElementById("pais_cidade");
 
-            if (!select || !select2) return;
+            if (!select) return;
 
             select.innerHTML = '<option value="">Selecione uma opção...</option>';
-            select2.innerHTML = '<option value="">Selecione uma opção...</option>';
 
             lista.forEach(item => {
                 // Criamos a opção para o primeiro select
@@ -107,12 +161,6 @@
                 option1.value = item.country_id;
                 option1.textContent = item.country;
                 select.appendChild(option1);
-
-                // Criamos uma COPIA (ou nova instância) para o segundo select
-                const option2 = document.createElement('option');
-                option2.value = item.country_id;
-                option2.textContent = item.country;
-                select2.appendChild(option2);
             });
         }
 
