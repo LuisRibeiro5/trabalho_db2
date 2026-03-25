@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema ORM</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        input, select, button {
+            display: block;
+            margin: 5px 0 10px;
+            padding: 5px;
+            width: 250px;
+        }
+        h2 {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sistema de Cadastro</h1>
+
+    <!-- CLIENTE -->
+    <form id="formCliente">
+        <h2>Cadastrar Cliente</h2>
+        
+        <label>Nome:</label>
+        <input type="text" id="clienteNome" required>
+
+        <label>Email:</label>
+        <input type="email" id="clienteEmail" required>
+
+        <button type="submit">Cadastrar Cliente</button>
+    </form>
+
+    <!-- PRODUTO -->
+    <form id="formProduto">
+        <h2>Cadastrar Produto</h2>
+        
+        <label>Nome:</label>
+        <input type="text" id="produtoNome" required>
+
+        <label>Preço:</label>
+        <input type="number" id="produtoPreco" required>
+
+        <button type="submit">Cadastrar Produto</button>
+    </form>
+
+    <!-- PEDIDO -->
+    <form id="formPedido">
+        <h2>Cadastrar País</h2>
+        
+        <label>Cliente:</label>
+        <select id="pedidoCliente"></select>
+
+        <label>Produtos (segure CTRL para múltiplos):</label>
+        <select id="pedidoProdutos" multiple></select>
+
+        <button type="submit">Cadastrar Pedido</button>
+    </form>
+
+    <!-- LISTAGENS -->
+    <h2>Listagem de Clientes</h2>
+    <div id="listaClientes"></div>
+
+    <h2>Listagem de Produtos</h2>
+    <div id="listaProdutos"></div>
+
+    <h2>Listagem de Pedidos</h2>
+    <div id="listaPedidos"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
