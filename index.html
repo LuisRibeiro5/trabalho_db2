@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,103 +10,132 @@
             font-family: Arial;
             margin: 20px;
         }
+
         form {
             margin-bottom: 30px;
             padding: 15px;
             border: 1px solid #ccc;
             border-radius: 8px;
         }
-        input, select, button {
+
+        input,
+        select,
+        button {
             display: block;
             margin: 5px 0 10px;
             padding: 5px;
             width: 250px;
         }
+
         h2 {
             margin-top: 40px;
         }
     </style>
 </head>
+
 <body>
-    <form action="/cadastrar_pais" method="POST">
+    <form action="http://localhost:3000/cadastrar_pais" method="POST">
         <!-- Label associado ao input via 'for' e 'id' -->
         <label for="nome">Nome do País:</label>
         <input type="text" id="pais" name="pais" required>
-      
+
         <!-- Botão para submeter o formulário -->
         <button type="submit">Enviar</button>
-      </form>
+    </form>
 
-      <form action="/cadastrar_cidade" method="POST">
+    <form action="http://localhost:3000/cadastrar_cidade" method="POST">
         <!-- Label associado ao input via 'for' e 'id' -->
         <label for="nome">Nome da Cidade:</label>
         <input type="text" id="cidade" name="cidade" required>
-      
+
 
         <label for="pais">Nome do país:</label>
-        <input list="paises" type="text" id="pais_cidade" name="pais_cidade" required>
+        <select id="pais_cidade" name="pais_cidade" required></select>
 
         <!-- Botão para submeter o formulário -->
         <button type="submit">Enviar</button>
-      </form>
+    </form>
 
-      <form action="http://localhost:3000/cadastrar_endereco" method="POST">
+    <form action="http://localhost:3000/cadastrar_endereco" method="POST">
         <!-- Label associado ao input via 'for' e 'id' -->
 
         <label for="nome">Nome da rua e numero:</label>
         <input type="text" id="endereco" name="endereco" required>
 
         <label for="nome">Nome da Cidade:</label>
-        <input list="cidades" type="text" id="cidade_endereco" name="cidade_endereco" required>
-      
-        <datalist id="cidades">
-            <option value="padrão"></option>
-          </datalist>
+        <select id="cidade_endereco" name="cidade_endereco" required></select>
 
         <label for="pais">Nome do país:</label>
-        <input list="paises" type="text" id="pais_endereco" name="pais_endereco" required>
+        <select id="pais_endereco" name="pais_endereco" required></select>
 
-        <datalist id="paises">
-            <option value="padrão"></option>
-          </datalist>
-      
-      
+
+
         <!-- Botão para submeter o formulário -->
         <button type="submit">Enviar</button>
-      </form>
+    </form>
 
-      
-    
-     <script>
-async function loadData() {
+
+
+    <script>
+        async function loadData() {
             try {
                 const cidadesResponse = await fetch('http://localhost:3000/listarCidades');
                 const cidades = await cidadesResponse.json();
-                preencherDatalist('cidades', cidades);
-    
+                preencherSelectCidades(cidades);
+
                 const paisesResponse = await fetch('http://localhost:3000/listarPaises');
                 const paises = await paisesResponse.json();
-                preencherDatalist('paises', paises);
+                preencherSelectPaises(paises);
             } catch (err) {
                 console.error('Erro ao carregar dados:', err);
             }
         }
 
-        function preencherDatalist(id, lista) {
-            const datalist = document.getElementById(id);
-            if (!datalist) return;
-    
-            // Limpa e popula o datalist
-            datalist.innerHTML = ''; 
+        function preencherSelectPaises(lista) {
+            // 1. Use aspas para buscar pelo ID
+            const select = document.getElementById("pais_endereco");
+            const select2 = document.getElementById("pais_cidade");
+
+            if (!select || !select2) return;
+
+            select.innerHTML = '<option value="">Selecione uma opção...</option>';
+            select2.innerHTML = '<option value="">Selecione uma opção...</option>';
+
             lista.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.country || item.city ;
-                datalist.appendChild(option);
+                // Criamos a opção para o primeiro select
+                const option1 = document.createElement('option');
+                option1.value = item.country_id;
+                option1.textContent = item.country;
+                select.appendChild(option1);
+
+                // Criamos uma COPIA (ou nova instância) para o segundo select
+                const option2 = document.createElement('option');
+                option2.value = item.country_id;
+                option2.textContent = item.country;
+                select2.appendChild(option2);
             });
         }
-    
+
+        function preencherSelectCidades(lista) {
+            const select = document.getElementById("cidade_endereco");
+            if (!select) return;
+
+            // Limpa as opções atuais
+            select.innerHTML = '<option value="">Selecione uma opção...</option>';
+
+            lista.forEach(item => {
+                const option = document.createElement('option');
+
+                option.value = item.city_id;
+                option.textContent = item.city;
+
+                select.appendChild(option);
+            });
+        }
+
         loadData();
 
-     </script>
+    </script>
 </body>
+
 </html>

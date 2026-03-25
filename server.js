@@ -3,7 +3,7 @@ const cors = require('cors'); // 1. Import it
 const app = express(); // Create an Express application instance
 app.use(cors()); // 2. Enable it for all routes
 const PORT = 3000; // Define the port number
-const {listarEnderecos, listarCidades, listarPaises} = require('./main')
+const {cadastrar_endereco, listarEnderecos, listarCidades, listarPaises} = require('./main')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -57,8 +57,11 @@ app.get('/listarEnderecos',async (req, res) => {
   }
 })
 
-app.post('/cadastrar_endereco', (req, res) => {
-  res.json(req.body);
+app.post('/cadastrar_endereco',async (req, res) => {
+  const dados = req.body
+  await cadastrar_endereco(dados.endereco, dados.cidade_endereco);
+  console.log(req.body, dados.endereco, dados.cidade_endereco)
+  res.status(200).json("Ok");
 })
 
 

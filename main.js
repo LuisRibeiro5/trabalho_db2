@@ -11,12 +11,12 @@ const Address = sequelize.define('Address', {
     address_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address: { type: DataTypes.STRING(50), allowNull: false },
     address2: { type: DataTypes.STRING(50), allowNull: true },
-    district: { type: DataTypes.STRING(20), allowNull: false },
-    city_id: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: false },
+    district: { type: DataTypes.STRING(20), allowNull: true },
+    city_id: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: true },
     postal_code: { type: DataTypes.STRING(10), allowNull: true },
-    phone: { type: DataTypes.STRING(20), allowNull: false },
+    phone: { type: DataTypes.STRING(20), allowNull: true },
     location: { type: DataTypes.GEOMETRY('POINT'), allowNull: true },
-    last_update: { type: DataTypes.DATE, allowNull: false }
+    last_update: { type: DataTypes.DATE, allowNull: true }
 }, { tableName: 'address', timestamps: false });
 
 const City = sequelize.define('city', {
@@ -89,21 +89,27 @@ async function inserirPais(pais) {
         console.error("Erro", error);
     }
 }
-
-// async function inserirCidade(cidade, pais) {
-//     try {
-//         Country.create({
-//             Country: pais,
-//             include: [City: {
-//                 cidade
-//             }]
-//         })
-//     }
-// }
+async function cadastrar_endereco(endereco, cidade) {
+    await Address.create({
+      address: endereco,       // obrigatório, passado como parâmetro
+      city_id: cidade,         // obrigatório, passado como parâmetro
+      district: '',            // obrigatório, string vazia como padrão
+      phone: '',               // obrigatório, string vazia como padrão
+      location: {              // obrigatório, ponto 0,0 como padrão (geométrico)
+        type: 'Point',
+        coordinates: [0, 0]
+      },
+      // Campos opcionais (podem ser omitidos ou nulos)
+      address2: null,
+      postal_code: null,
+      // last_update é gerado automaticamente pelo banco
+    });
+  }
 module.exports = {
     listarPaises,
     listarCidades,
-    listarEnderecos
+    listarEnderecos,
+    cadastrar_endereco
 }
 //listarDadosCompletos()
 //listarCidades();
