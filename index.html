@@ -1,16 +1,100 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Gerenciador de Endereços</title>
     <style>
-        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
-        form { border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 400px; margin-bottom: 20px; }
-        input { width: 100%; padding: 8px; margin: 10px 0; display: block; }
-        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f4f7f6;
+            --text-color: #333;
+            --border-radius: 8px;
+        }
+    
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+    
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+    
+        form {
+            background: white;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.2s;
+        }
+    
+        form:hover {
+            transform: translateY(-2px);
+        }
+    
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+    
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            box-sizing: border-box; /* Garante que o padding não aumente a largura */
+            font-size: 16px;
+            outline: none;
+        }
+    
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+    
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+    
+        button:hover {
+            background-color: #357abd;
+        }
+    
+        /* Título para separar os formulários visualmente */
+        .form-title {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
     </style>
 </head>
+
 <body>
+
     <h2>1. Cadastrar País</h2>
     <form action="http://localhost:3000/cadastrar_pais" method="POST">
         <label>Nome do País:</label>
@@ -41,8 +125,48 @@
     <datalist id="paises"></datalist>
     <datalist id="cidades"></datalist>
 
+    <span>================================</span>
+
+
+    <form action="http://localhost:3000/cadastrar_pais" method="POST">
+        <!-- Label associado ao input via 'for' e 'id' -->
+        <label for="nome">Nome do País:</label>
+        <input type="text" id="pais" name="pais" required>
+
+        <!-- Botão para submeter o formulário -->
+        <button type="submit">Enviar</button>
+    </form>
+
+    <form action="http://localhost:3000/cadastrar_cidade" method="POST">
+        <!-- Label associado ao input via 'for' e 'id' -->
+        <label for="nome">Nome da Cidade:</label>
+        <input type="text" id="cidade" name="cidade" required>
+
+
+        <label for="pais">Nome do país:</label>
+        <select id="pais_cidade" name="pais_cidade" required></select>
+
+        <!-- Botão para submeter o formulário -->
+        <button type="submit">Enviar</button>
+    </form>
+
+    <form action="http://localhost:3000/cadastrar_endereco" method="POST">
+        <!-- Label associado ao input via 'for' e 'id' -->
+
+        <label for="nome">Nome da rua e numero:</label>
+        <input type="text" id="endereco" name="endereco" required>
+
+        <label for="nome">Nome da Cidade:</label>
+        <select id="cidade_endereco" name="cidade_endereco" required></select>
+
+        <!-- Botão para submeter o formulário -->
+        <button type="submit">Enviar</button>
+    </form>
+
+
+
     <script>
-        async function loadData() {
+        async function loadData2() {
             const resPaises = await fetch('http://localhost:3000/listarPaises');
             const paises = await resPaises.json();
             const dlPaises = document.getElementById('paises');
@@ -53,7 +177,60 @@
             const dlCidades = document.getElementById('cidades');
             cidades.forEach(c => dlCidades.innerHTML += `<option value="${c.city}">`);
         }
+        loadData2();
+
+        async function loadData() {
+            try {
+                const cidadesResponse = await fetch('http://localhost:3000/listarCidades');
+                const cidades = await cidadesResponse.json();
+                preencherSelectCidades(cidades);
+
+                const paisesResponse = await fetch('http://localhost:3000/listarPaises');
+                const paises = await paisesResponse.json();
+                preencherSelectPaises(paises);
+            } catch (err) {
+                console.error('Erro ao carregar dados:', err);
+            }
+        }
+
+        function preencherSelectPaises(lista) {
+            // 1. Use aspas para buscar pelo ID
+            const select = document.getElementById("pais_cidade");
+
+            if (!select) return;
+
+            select.innerHTML = '<option value="">Selecione uma opção...</option>';
+
+            lista.forEach(item => {
+                // Criamos a opção para o primeiro select
+                const option1 = document.createElement('option');
+                option1.value = item.country_id;
+                option1.textContent = item.country;
+                select.appendChild(option1);
+            });
+        }
+
+        function preencherSelectCidades(lista) {
+            const select = document.getElementById("cidade_endereco");
+            if (!select) return;
+
+            // Limpa as opções atuais
+            select.innerHTML = '<option value="">Selecione uma opção...</option>';
+
+            lista.forEach(item => {
+                const option = document.createElement('option');
+
+                option.value = item.city_id;
+                option.textContent = item.city;
+
+                select.appendChild(option);
+            });
+        }
+
         loadData();
+
     </script>
 </body>
+
+>>>>>>> c5964f5e113612a2599fda7bfebaea438f919589
 </html>
