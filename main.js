@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
+// --- Configurações de Conexão ---
 const HOST = "mysql-209830-0.cloudclusters.net";
 const USER = "admin";
 const PASSWORD = "81DvDok0";
@@ -13,23 +14,13 @@ const sequelize = new Sequelize(DATABASE, USER, PASSWORD, {
     logging: false 
 });
 
+// --- Definição dos Modelos ---
+
 const Country = sequelize.define('country', {
     country_id: { type: DataTypes.SMALLINT.UNSIGNED, autoIncrement: true, primaryKey: true },
     country: { type: DataTypes.STRING(50), allowNull: false },
     last_update: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, { tableName: 'country', timestamps: false });
-
-const Address = sequelize.define('Address', {
-    address_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    address: { type: DataTypes.STRING(50), allowNull: false },
-    address2: { type: DataTypes.STRING(50), allowNull: true },
-    district: { type: DataTypes.STRING(20), allowNull: true },
-    city_id: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: true },
-    postal_code: { type: DataTypes.STRING(10), allowNull: true },
-    phone: { type: DataTypes.STRING(20), allowNull: true },
-    location: { type: DataTypes.GEOMETRY('POINT'), allowNull: false },
-    last_update: { type: DataTypes.DATE, allowNull: true }
-}, { tableName: 'address', timestamps: false });
 
 const City = sequelize.define('city', {
     city_id: { type: DataTypes.SMALLINT.UNSIGNED, autoIncrement: true, primaryKey: true },
@@ -38,13 +29,25 @@ const City = sequelize.define('city', {
     last_update: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, { tableName: 'city', timestamps: false });
 
-// --- Relacionamentos (Requisito A) ---
+const Address = sequelize.define('Address', {
+    address_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    address: { type: DataTypes.STRING(50), allowNull: false },
+    address2: { type: DataTypes.STRING(50), allowNull: true },
+    district: { type: DataTypes.STRING(20), allowNull: false }, // Obrigatório na Sakila
+    city_id: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: false },
+    postal_code: { type: DataTypes.STRING(10), allowNull: true },
+    phone: { type: DataTypes.STRING(20), allowNull: false }, // Obrigatório na Sakila
+    location: { type: DataTypes.GEOMETRY('POINT'), allowNull: true }, // Alterado para true para evitar erros de insert
+    last_update: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+}, { tableName: 'address', timestamps: false });
+
+// --- Relacionamentos ---
 City.belongsTo(Country, { foreignKey: 'country_id' });
 Country.hasMany(City, { foreignKey: 'country_id' });
 Address.belongsTo(City, { foreignKey: 'city_id' });
 City.hasMany(Address, { foreignKey: 'city_id' });
 
-// --- Listagens (Requisito B) ---
+// --- Funções de Listagem ---
 
 async function listarPaises() {
     return await Country.findAll({ raw: true });
@@ -60,7 +63,7 @@ async function listarEnderecos() {
     });
 }
 
-// --- Inserções (Requisito C) ---
+// --- Funções de Inserção ---
 
 async function cadastrarPais(nomePais) {
     return await Country.create({ country: nomePais });
@@ -73,32 +76,27 @@ async function cadastrarCidade(nomeCidade, idPais) {
     });
 }
 
-async function cadastrar_endereco(endereco, cidade) {
-    await Address.create({
-<<<<<<< HEAD
-      address: endereco,       // obrigatório, passado como parâmetro
-      city_id: cidade,         // obrigatório, passado como parâmetro
-      district: '',            // obrigatório, string vazia como padrão
-      phone: '',               // obrigatório, string vazia como padrão
-      location: {              
-=======
-      address: endereco,       
-      city_id: cidade,         
-      district: '',           
-      phone: '',              
-      location: {            
->>>>>>> 89a66d6aadeecca5232cb403f27919f16dce52a9
+async function cadastrar_endereco(endereco, id_cidade) {
+    return await Address.create({
+      address: endereco,
+      city_id: id_cidade,
+      district: 'N/A', // Valor padrão para evitar erro de campo vazio
+      phone: '00000000', // Valor padrão para evitar erro de campo vazio
+      location: {
         type: 'Point',
         coordinates: [0, 0]
       },
       address2: null,
-      postal_code: null,
+      postal_code: null
     });
-  }
+}
+
+// --- Exportação ---
 module.exports = {
     listarPaises,
     listarCidades,
     listarEnderecos,
-    cadastrar_endereco, cadastrarPais, cadastrarCidade
-}
-
+    cadastrar_endereco, 
+    cadastrarPais, 
+    cadastrarCidade
+};
