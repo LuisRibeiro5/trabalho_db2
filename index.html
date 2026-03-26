@@ -56,7 +56,7 @@
             margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
-            box-sizing: border-box; /* Garante que o padding não aumente a largura */
+            box-sizing: border-box;
             font-size: 16px;
             outline: none;
         }
@@ -82,31 +82,22 @@
         button:hover {
             background-color: #357abd;
         }
-    
-        /* Título para separar os formulários visualmente */
-        .form-title {
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 5px;
-            margin-bottom: 20px;
-            font-size: 1.2em;
-        }
     </style>
 </head>
 
 <body>
 
     <h2>1. Cadastrar País</h2>
-    <form action="http://localhost:3000/cadastrar_pais" method="POST">
+    <form id="formPais">
         <label>Nome do País:</label>
-        <input type="text" name="pais" required>
-
+        <input type="text" name="pais" id="pais" required>
         <button type="submit">Cadastrar País</button>
     </form>
 
     <h2>2. Cadastrar Cidade</h2>
-    <form action="http://localhost:3000/cadastrar_cidade" method="POST">
+    <form id="formCidade">
         <label>Nome da Cidade:</label>
-        <input type="text" name="cidade" required>
+        <input type="text" name="cidade" id="cidade" required>
 
         <label>Nome do País:</label>
         <select name="pais_cidade" id="pais_cidade" required></select>
@@ -115,17 +106,18 @@
     </form>
 
     <h2>3. Cadastrar Endereço Completo</h2>
-    <form action="http://localhost:3000/cadastrar_endereco" method="POST">
+    <form id="formEndereco">
         <label>Rua e Número:</label>
-        <input type="text" name="endereco" required>
+        <input type="text" name="endereco" id="endereco" required>
 
         <label>Cidade:</label>
-        <select name="cidade_endereco" id="cidade_endereco"></select>
+        <select name="cidade_endereco" id="cidade_endereco" required></select>
 
-        <button type="submit">Cadastrar Endereco</button>
+        <button type="submit">Cadastrar Endereço</button>
     </form>
 
     <script>
+        // --- FUNÇÕES DE CARREGAMENTO (GET) ---
         async function loadData() {
             try {
                 const cidadesResponse = await fetch('http://localhost:3000/listarCidades');
@@ -141,42 +133,83 @@
         }
 
         function preencherSelectPaises(lista) {
-            // 1. Use aspas para buscar pelo ID
             const select = document.getElementById("pais_cidade");
-
             if (!select) return;
-
-            select.innerHTML = '<option value="">Selecione uma opção...</option>';
-
+            select.innerHTML = '<option value="">Selecione um país...</option>';
             lista.forEach(item => {
-                // Criamos a opção para o primeiro select
-                const option1 = document.createElement('option');
-                option1.value = item.country_id;
-                option1.textContent = item.country;
-                select.appendChild(option1);
+                const option = document.createElement('option');
+                option.value = item.country_id;
+                option.textContent = item.country;
+                select.appendChild(option);
             });
         }
 
         function preencherSelectCidades(lista) {
             const select = document.getElementById("cidade_endereco");
             if (!select) return;
-
-            // Limpa as opções atuais
-            select.innerHTML = '<option value="">Selecione uma opção...</option>';
-
+            select.innerHTML = '<option value="">Selecione uma cidade...</option>';
             lista.forEach(item => {
                 const option = document.createElement('option');
-
                 option.value = item.city_id;
                 option.textContent = item.city;
-
                 select.appendChild(option);
             });
         }
 
+        // --- LÓGICA DE ENVIO (POST) SEM RECARREGAR PÁGINA ---
+
+        async function handleFormSubmit(event, url, bodyData) {
+            event.preventDefault(); // Impede o envio padrão do formulário
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
+
+                const mensagem = await response.text();
+
+                if (response.ok) {
+                    alert("Sucesso: " + mensagem);
+                    event.target.reset(); // Limpa o formulário
+                    loadData(); // Atualiza os selects com os novos dados
+                } else {
+                    // Aqui exibe a mensagem de erro definida no main.js (ex: "País já cadastrado")
+                    alert("Atenção: " + mensagem);
+                }
+            } catch (error) {
+                alert("Erro ao conectar com o servidor.");
+            }
+        }
+
+        // Evento Formulário País
+        document.getElementById('formPais').addEventListener('submit', (e) => {
+            const data = { pais: document.getElementById('pais').value };
+            handleFormSubmit(e, 'http://localhost:3000/cadastrar_pais', data);
+        });
+
+        // Evento Formulário Cidade
+        document.getElementById('formCidade').addEventListener('submit', (e) => {
+            const data = { 
+                cidade: document.getElementById('cidade').value,
+                pais_cidade: document.getElementById('pais_cidade').value
+            };
+            handleFormSubmit(e, 'http://localhost:3000/cadastrar_cidade', data);
+        });
+
+        // Evento Formulário Endereço
+        document.getElementById('formEndereco').addEventListener('submit', (e) => {
+            const data = { 
+                endereco: document.getElementById('endereco').value,
+                cidade_endereco: document.getElementById('cidade_endereco').value
+            };
+            handleFormSubmit(e, 'http://localhost:3000/cadastrar_endereco', data);
+        });
+
+        // Carrega os dados iniciais
         loadData();
 
     </script>
 </body>
-
 </html>

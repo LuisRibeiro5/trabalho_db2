@@ -33,11 +33,11 @@ const Address = sequelize.define('Address', {
     address_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     address: { type: DataTypes.STRING(50), allowNull: false },
     address2: { type: DataTypes.STRING(50), allowNull: true },
-    district: { type: DataTypes.STRING(20), allowNull: false }, // Obrigatório na Sakila
+    district: { type: DataTypes.STRING(20), allowNull: false },
     city_id: { type: DataTypes.SMALLINT.UNSIGNED, allowNull: false },
     postal_code: { type: DataTypes.STRING(10), allowNull: true },
-    phone: { type: DataTypes.STRING(20), allowNull: false }, // Obrigatório na Sakila
-    location: { type: DataTypes.GEOMETRY('POINT'), allowNull: true }, // Alterado para true para evitar erros de insert
+    phone: { type: DataTypes.STRING(20), allowNull: false },
+    location: { type: DataTypes.GEOMETRY('POINT'), allowNull: true },
     last_update: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, { tableName: 'address', timestamps: false });
 
@@ -48,7 +48,6 @@ Address.belongsTo(City, { foreignKey: 'city_id' });
 City.hasMany(Address, { foreignKey: 'city_id' });
 
 // --- Funções de Listagem ---
-
 async function listarPaises() {
     return await Country.findAll({ raw: true });
 }
@@ -63,40 +62,42 @@ async function listarEnderecos() {
     });
 }
 
-// --- Funções de Inserção ---
+// --- Funções de Inserção com findOrCreate ---
 
 async function cadastrarPais(nomePais) {
-    return await Country.create({ country: nomePais });
+    const [pais, criado] = await Country.findOrCreate({
+        where: { country: nomePais },
+        defaults: { country: nomePais }
+    });
+    if (!criado) throw new Error('Este país já está cadastrado!');
+    return pais;
 }
 
 async function cadastrarCidade(nomeCidade, idPais) {
-    return await City.create({
-        city: nomeCidade,
-        country_id: idPais
+    const [cidade, criado] = await City.findOrCreate({
+        where: { city: nomeCidade, country_id: idPais },
+        defaults: { city: nomeCidade, country_id: idPais }
     });
+    if (!criado) throw new Error('Esta cidade já está cadastrada para este país!');
+    return cidade;
 }
 
 async function cadastrar_endereco(endereco, id_cidade) {
-    return await Address.create({
-      address: endereco,
-      city_id: id_cidade,
-      district: 'N/A', // Valor padrão para evitar erro de campo vazio
-      phone: '00000000', // Valor padrão para evitar erro de campo vazio
-      location: {
-        type: 'Point',
-        coordinates: [0, 0]
-      },
-      address2: null,
-      postal_code: null
+    const [addr, criado] = await Address.findOrCreate({
+        where: { address: endereco, city_id: id_cidade },
+        defaults: {
+            address: endereco,
+            city_id: id_cidade,
+            district: 'N/A',
+            phone: '00000000',
+            location: { type: 'Point', coordinates: [0, 0] }
+        }
     });
+    if (!criado) throw new Error('Este endereço já existe nesta cidade!');
+    return addr;
 }
 
-// --- Exportação ---
 module.exports = {
-    listarPaises,
-    listarCidades,
-    listarEnderecos,
-    cadastrar_endereco, 
-    cadastrarPais, 
-    cadastrarCidade
+    listarPaises, listarCidades, listarEnderecos,
+    cadastrar_endereco, cadastrarPais, cadastrarCidade
 };
