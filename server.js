@@ -38,7 +38,7 @@ app.get('/listarEnderecos', async (req, res) => {
 app.post('/cadastrar_pais', async (req, res) => {
     try {
         await cadastrarPais(req.body.pais);
-        res.send('País cadastrado! <a href="/trabalho_db2/">Voltar</a>');
+        res.send('País cadastrado! <a href="http://localhost:5500/trabalho_db2/index.html"> Voltar</a>');
     } catch (e) { res.status(500).send(e.message); }
 });
 
@@ -62,14 +62,14 @@ app.post('/cadastrar_endereco_l',async (req, res) => {
 app.post('/cadastrar_cidade', async (req, res) => {
     try {
         await cadastrarCidade(req.body.cidade, req.body.pais_cidade);
-        res.send('Cidade cadastrada! <a href="/trabalho_db2/">Voltar</a>');
+        res.send('Cidade cadastrada! <a href="http://localhost:5500/trabalho_db2/index.html">Voltar</a>');
     } catch (e) { res.status(500).send(e.message); }
 });
 
 app.post('/cadastrar_endereco', async (req, res) => {
     try {
         await cadastrarEndereco(req.body.endereco, req.body.cidade_endereco, req.body.pais_endereco);
-        res.send('Endereço completo cadastrado! <a href="5500/trabalho_db2/index.html">Voltar</a>');
+        res.send('Endereço completo cadastrado! <a href="http://localhost:5500/trabalho_db2/index.html">Voltar</a>');
     } catch (e) { res.status(500).send(e.message); }
 });
 

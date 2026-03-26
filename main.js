@@ -1,10 +1,10 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-const HOST = "mysql-209528-0.cloudclusters.net";
-const USER = "aula";
-const PASSWORD = "aula";
+const HOST = "mysql-209830-0.cloudclusters.net";
+const USER = "admin";
+const PASSWORD = "81DvDok0";
 const DATABASE = "sakila";
-const PORT = 10052;
+const PORT = 19121;
 
 const sequelize = new Sequelize(DATABASE, USER, PASSWORD, { 
     host: HOST, 
@@ -101,7 +101,7 @@ async function cadastrar_endereco(endereco, cidade) {
       city_id: cidade,         // obrigatório, passado como parâmetro
       district: '',            // obrigatório, string vazia como padrão
       phone: '',               // obrigatório, string vazia como padrão
-      location: {              // obrigatório, ponto 0,0 como padrão (geométrico)
+      location: {              
         type: 'Point',
         coordinates: [0, 0]
       },
