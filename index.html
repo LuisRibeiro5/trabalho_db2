@@ -99,6 +99,7 @@
     <form action="http://localhost:3000/cadastrar_pais" method="POST">
         <label>Nome do País:</label>
         <input type="text" name="pais" required>
+
         <button type="submit">Cadastrar País</button>
     </form>
 
@@ -106,8 +107,10 @@
     <form action="http://localhost:3000/cadastrar_cidade" method="POST">
         <label>Nome da Cidade:</label>
         <input type="text" name="cidade" required>
+
         <label>Nome do País:</label>
-        <input list="paises" name="pais_cidade" required>
+        <select name="pais_cidade" id="pais_cidade" required></select>
+        
         <button type="submit">Cadastrar Cidade</button>
     </form>
 
@@ -115,70 +118,14 @@
     <form action="http://localhost:3000/cadastrar_endereco" method="POST">
         <label>Rua e Número:</label>
         <input type="text" name="endereco" required>
+
         <label>Cidade:</label>
-        <input list="cidades" name="cidade_endereco" required>
-        <label>País:</label>
-        <input list="paises" name="pais_endereco" required>
-        <button type="submit">Cadastrar Tudo</button>
+        <select name="cidade_endereco" id="cidade_endereco"></select>
+
+        <button type="submit">Cadastrar Endereco</button>
     </form>
-
-    <datalist id="paises"></datalist>
-    <datalist id="cidades"></datalist>
-
-    <span>================================</span>
-
-
-    <form action="http://localhost:3000/cadastrar_pais" method="POST">
-        <!-- Label associado ao input via 'for' e 'id' -->
-        <label for="nome">Nome do País:</label>
-        <input type="text" id="pais" name="pais" required>
-
-        <!-- Botão para submeter o formulário -->
-        <button type="submit">Enviar</button>
-    </form>
-
-    <form action="http://localhost:3000/cadastrar_cidade" method="POST">
-        <!-- Label associado ao input via 'for' e 'id' -->
-        <label for="nome">Nome da Cidade:</label>
-        <input type="text" id="cidade" name="cidade" required>
-
-
-        <label for="pais">Nome do país:</label>
-        <select id="pais_cidade" name="pais_cidade" required></select>
-
-        <!-- Botão para submeter o formulário -->
-        <button type="submit">Enviar</button>
-    </form>
-
-    <form action="http://localhost:3000/cadastrar_endereco_l" method="POST">
-        <!-- Label associado ao input via 'for' e 'id' -->
-
-        <label for="nome">Nome da rua e numero:</label>
-        <input type="text" id="endereco" name="endereco" required>
-
-        <label for="nome">Nome da Cidade:</label>
-        <select id="cidade_endereco" name="cidade_endereco" required></select>
-
-        <!-- Botão para submeter o formulário -->
-        <button type="submit">Enviar</button>
-    </form>
-
-
 
     <script>
-        async function loadData2() {
-            const resPaises = await fetch('http://localhost:3000/listarPaises');
-            const paises = await resPaises.json();
-            const dlPaises = document.getElementById('paises');
-            paises.forEach(p => dlPaises.innerHTML += `<option value="${p.country}">`);
-
-            const resCidades = await fetch('http://localhost:3000/listarCidades');
-            const cidades = await resCidades.json();
-            const dlCidades = document.getElementById('cidades');
-            cidades.forEach(c => dlCidades.innerHTML += `<option value="${c.city}">`);
-        }
-        loadData2();
-
         async function loadData() {
             try {
                 const cidadesResponse = await fetch('http://localhost:3000/listarCidades');
@@ -232,5 +179,4 @@
     </script>
 </body>
 
->>>>>>> c5964f5e113612a2599fda7bfebaea438f919589
 </html>
