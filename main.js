@@ -85,6 +85,7 @@ async function cadastrarCidade(nomeCidade, nomePais) {
 async function cadastrarEndereco(rua, nomeCidade, nomePais) {
     return await Address.create({
         address: rua,
+        location: { type: 'Point', coordinates: [0, 0] },  // valor padrão para location
         city: {
             city: nomeCidade,
             country: { country: nomePais }
