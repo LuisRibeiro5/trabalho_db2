@@ -2,110 +2,58 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criação de Endereços</title>
+    <title>Gerenciador de Endereços</title>
     <style>
-        body {
-            font-family: Arial;
-            margin: 20px;
-        }
-        form {
-            margin-bottom: 30px;
-            padding: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-        input, select, button {
-            display: block;
-            margin: 5px 0 10px;
-            padding: 5px;
-            width: 250px;
-        }
-        h2 {
-            margin-top: 40px;
-        }
+        body { font-family: sans-serif; margin: 40px; line-height: 1.6; }
+        form { border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 400px; margin-bottom: 20px; }
+        input { width: 100%; padding: 8px; margin: 10px 0; display: block; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <form action="/cadastrar_pais" method="POST">
-        <!-- Label associado ao input via 'for' e 'id' -->
-        <label for="nome">Nome do País:</label>
-        <input type="text" id="pais" name="pais" required>
-      
-        <!-- Botão para submeter o formulário -->
-        <button type="submit">Enviar</button>
-      </form>
+    <h2>1. Cadastrar País</h2>
+    <form action="http://localhost:3000/cadastrar_pais" method="POST">
+        <label>Nome do País:</label>
+        <input type="text" name="pais" required>
+        <button type="submit">Cadastrar País</button>
+    </form>
 
-      <form action="/cadastrar_cidade" method="POST">
-        <!-- Label associado ao input via 'for' e 'id' -->
-        <label for="nome">Nome da Cidade:</label>
-        <input type="text" id="cidade" name="cidade" required>
-      
+    <h2>2. Cadastrar Cidade</h2>
+    <form action="http://localhost:3000/cadastrar_cidade" method="POST">
+        <label>Nome da Cidade:</label>
+        <input type="text" name="cidade" required>
+        <label>Nome do País:</label>
+        <input list="paises" name="pais_cidade" required>
+        <button type="submit">Cadastrar Cidade</button>
+    </form>
 
-        <label for="pais">Nome do país:</label>
-        <input list="paises" type="text" id="pais_cidade" name="pais_cidade" required>
+    <h2>3. Cadastrar Endereço Completo</h2>
+    <form action="http://localhost:3000/cadastrar_endereco" method="POST">
+        <label>Rua e Número:</label>
+        <input type="text" name="endereco" required>
+        <label>Cidade:</label>
+        <input list="cidades" name="cidade_endereco" required>
+        <label>País:</label>
+        <input list="paises" name="pais_endereco" required>
+        <button type="submit">Cadastrar Tudo</button>
+    </form>
 
-        <!-- Botão para submeter o formulário -->
-        <button type="submit">Enviar</button>
-      </form>
+    <datalist id="paises"></datalist>
+    <datalist id="cidades"></datalist>
 
-      <form action="/cadastrar_endereco" method="POST">
-        <!-- Label associado ao input via 'for' e 'id' -->
+    <script>
+        async function loadData() {
+            const resPaises = await fetch('http://localhost:3000/listarPaises');
+            const paises = await resPaises.json();
+            const dlPaises = document.getElementById('paises');
+            paises.forEach(p => dlPaises.innerHTML += `<option value="${p.country}">`);
 
-        <label for="nome">Nome da rua e numero:</label>
-        <input type="text" id="endereco" name="endereco" required>
-
-        <label for="nome">Nome da Cidade:</label>
-        <input list="cidades" type="text" id="cidade_endereco" name="cidade_endereco" required>
-      
-        <datalist id="cidades">
-            <option value="padrão"></option>
-          </datalist>
-
-        <label for="pais">Nome do país:</label>
-        <input list="paises" type="text" id="pais_endereco" name="pais_endereco" required>
-
-        <datalist id="paises">
-            <option value="padrão"></option>
-          </datalist>
-      
-      
-        <!-- Botão para submeter o formulário -->
-        <button type="submit">Enviar</button>
-      </form>
-
-      
-    
-     <script>
-async function loadData() {
-            try {
-                const cidadesResponse = await fetch('http://localhost:3000/listarCidades');
-                const cidades = await cidadesResponse.json();
-                preencherDatalist('cidades', cidades);
-    
-                const paisesResponse = await fetch('http://localhost:3000/listarPaises');
-                const paises = await paisesResponse.json();
-                preencherDatalist('paises', paises);
-            } catch (err) {
-                console.error('Erro ao carregar dados:', err);
-            }
+            const resCidades = await fetch('http://localhost:3000/listarCidades');
+            const cidades = await resCidades.json();
+            const dlCidades = document.getElementById('cidades');
+            cidades.forEach(c => dlCidades.innerHTML += `<option value="${c.city}">`);
         }
-
-        function preencherDatalist(id, lista) {
-            const datalist = document.getElementById(id);
-            if (!datalist) return;
-    
-            // Limpa e popula o datalist
-            datalist.innerHTML = ''; 
-            lista.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.country || item.city ;
-                datalist.appendChild(option);
-            });
-        }
-    
         loadData();
-
-     </script>
+    </script>
 </body>
 </html>
