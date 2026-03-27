@@ -11,7 +11,7 @@
             --text-color: #333;
             --border-radius: 8px;
         }
-    
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--secondary-color);
@@ -22,12 +22,13 @@
             padding: 40px 20px;
             margin: 0;
         }
-    
+
         h2 {
             color: var(--primary-color);
+            margin-top: 30px;
             margin-bottom: 20px;
         }
-    
+
         form {
             background: white;
             padding: 25px;
@@ -36,20 +37,15 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
-            transition: transform 0.2s;
         }
-    
-        form:hover {
-            transform: translateY(-2px);
-        }
-    
+
         label {
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
             font-size: 14px;
         }
-    
+
         input, select {
             width: 100%;
             padding: 12px;
@@ -58,14 +54,8 @@
             border-radius: var(--border-radius);
             box-sizing: border-box;
             font-size: 16px;
-            outline: none;
         }
-    
-        input:focus, select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-        }
-    
+
         button {
             width: 100%;
             padding: 12px;
@@ -78,15 +68,60 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-    
+
         button:hover {
             background-color: #357abd;
+        }
+
+        .tabela-tabela {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-ver-todos {
+            width: auto;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background-color: #6c757d;
+        }
+
+        .btn-recolher {
+            width: auto;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background-color: #dc3545;
+            display: none;
+        }
+
+        .btn-recolher:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
 
 <body>
-
     <h2>1. Cadastrar País</h2>
     <form id="formPais">
         <label>Nome do País:</label>
@@ -101,7 +136,7 @@
 
         <label>Nome do País:</label>
         <select name="pais_cidade" id="pais_cidade" required></select>
-        
+
         <button type="submit">Cadastrar Cidade</button>
     </form>
 
@@ -116,100 +151,133 @@
         <button type="submit">Cadastrar Endereço</button>
     </form>
 
+    <h2 style="color: var(--primary-color); margin-top: 0;">Últimos Cadastros</h2>
+
+    <div id="containerPaises" class="tabela-tabela" style="margin: 0 auto;">
+        <h3 style="text-align: center; margin-top: 0; color: #333;">Tabela de Países</h3>
+        <table id="tabelaPaises">
+            <thead><tr><th>ID</th><th>País</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <center>
+            <button id="btnVerTodosPaises" class="btn-ver-todos" onclick="expandirTabela('Paises')">Visualizar Todos os Países</button>
+            <button id="btnRecolherPaises" class="btn-recolher" onclick="recolherTabela('Paises')">Mostrar Menos</button>
+        </center>
+    </div>
+
+    <div id="tabelaCidades" class="tabela-tabela" style="margin: 0 auto;">
+        <h3 style="text-align: center; margin-top: 0; color: #333;">Tabela de Cidades</h3>
+        <table id="tabelaCidades">
+            <thead><tr><th>ID</th><th>Cidade</th><th>País</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <center>
+            <button id="btnVerTodosCidades" class="btn-ver-todos" onclick="expandirTabela('Cidades')">Visualizar Todas as Cidades</button>
+            <button id="btnRecolherCidades" class="btn-recolher" onclick="recolherTabela('Cidades')">Mostrar Menos</button>
+        </center>
+    </div>
+
+    <div id="tabelaEnderecos" class="tabela-tabela" style="margin: 0 auto;">
+        <h3 style="text-align: center; margin-top: 0; color: #333;">Tabela de Endereços</h3>
+        <table id="tabelaEnderecos">
+            <thead><tr><th>ID</th><th>Endereço</th><th>Cidade</th><th>País</th></tr></thead>
+            <tbody></tbody>
+        </table>
+        <center>
+            <button id="btnVerTodosEnderecos" class="btn-ver-todos" onclick="expandirTabela('Enderecos')">Visualizar Todos os Endereços</button>
+            <button id="btnRecolherEnderecos" class="btn-recolher" onclick="recolherTabela('Enderecos')">Mostrar Menos</button>
+        </center>
+    </div>
+
     <script>
-        // --- FUNÇÕES DE CARREGAMENTO (GET) ---
+        // Configuração visual das linhas das tabelas
+        const templatesLinhas = {
+            'Paises': row => `<td>${row.country_id}</td><td>${row.country}</td>`,
+            'Cidades': row => `<td>${row.city_id}</td><td>${row.city}</td><td>${row.country ? row.country.country : 'N/A'}</td>`,
+            'Enderecos': row => `<td>${row.address_id}</td><td>${row.address}</td><td>${row.city ? row.city.city : 'N/A'}</td><td>${row.city && row.city.country ? row.city.country.country : 'N/A'}</td>`
+        };
+
+        const todasAsTabelas = ['Paises', 'Cidades', 'Enderecos'];
+
+        // --- CARREGAMENTO DE DADOS ---
         async function loadData() {
             try {
-                const cidadesResponse = await fetch('http://localhost:3000/listarCidades');
-                const cidades = await cidadesResponse.json();
-                preencherSelectCidades(cidades);
+                const cp = await fetch('http://localhost:3000/listarPaises');
+                preencherSelect(document.getElementById("pais_cidade"), await cp.json(), 'country_id', 'country');
 
-                const paisesResponse = await fetch('http://localhost:3000/listarPaises');
-                const paises = await paisesResponse.json();
-                preencherSelectPaises(paises);
-            } catch (err) {
-                console.error('Erro ao carregar dados:', err);
-            }
+                const cc = await fetch('http://localhost:3000/listarCidades');
+                preencherSelect(document.getElementById("cidade_endereco"), await cc.json(), 'city_id', 'city');
+
+                todasAsTabelas.forEach(tipo => recolherTabela(tipo));
+            } catch (err) { console.error('Erro:', err); }
         }
 
-        function preencherSelectPaises(lista) {
-            const select = document.getElementById("pais_cidade");
+        // Preenche os menus suspensos (selects)
+        function preencherSelect(select, lista, idKey, textKey) {
             if (!select) return;
-            select.innerHTML = '<option value="">Selecione um país...</option>';
+            select.innerHTML = '<option value="">Selecione...</option>';
             lista.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.country_id;
-                option.textContent = item.country;
-                select.appendChild(option);
+                const opt = document.createElement('option');
+                opt.value = item[idKey];
+                opt.textContent = item[textKey];
+                select.appendChild(opt);
             });
         }
 
-        function preencherSelectCidades(lista) {
-            const select = document.getElementById("cidade_endereco");
-            if (!select) return;
-            select.innerHTML = '<option value="">Selecione uma cidade...</option>';
-            lista.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.city_id;
-                option.textContent = item.city;
-                select.appendChild(option);
+        // Atualiza o conteúdo das tabelas (limitado a 10 ou completo)
+        async function atualizarTabela(url, tabelaId, rowTemplate, mostrarTodos) {
+            const resp = await fetch(url);
+            const dados = await resp.json();
+            const body = document.querySelector(`#${tabelaId} tbody`);
+            
+            const dadosParaMostrar = mostrarTodos ? dados : dados.slice(0, 10);
+            body.innerHTML = dadosParaMostrar.map(row => `<tr>${rowTemplate(row)}</tr>`).join('');
+        }
+
+        // --- CONTROLES DE INTERFACE (Expandir/Recolher) ---
+        function expandirTabela(tipoExpandido) {
+            todasAsTabelas.forEach(tipo => {
+                if (tipo === tipoExpandido) {
+                    atualizarTabela(`http://localhost:3000/listar${tipo}`, `tabela${tipo}`, templatesLinhas[tipo], true);
+                    document.getElementById(`btnVerTodos${tipo}`).style.display = 'none';
+                    document.getElementById(`btnRecolher${tipo}`).style.display = 'inline-block';
+                } else {
+                    recolherTabela(tipo);
+                }
             });
         }
 
-        // --- LÓGICA DE ENVIO (POST) SEM RECARREGAR PÁGINA ---
+        function recolherTabela(tipo) {
+            atualizarTabela(`http://localhost:3000/listar${tipo}`, `tabela${tipo}`, templatesLinhas[tipo], false);
+            document.getElementById(`btnVerTodos${tipo}`).style.display = 'inline-block';
+            document.getElementById(`btnRecolher${tipo}`).style.display = 'none';
+        }
 
+        // --- SUBMISSÃO DE FORMULÁRIOS ---
         async function handleFormSubmit(event, url, bodyData) {
-            event.preventDefault(); // Impede o envio padrão do formulário
-
+            event.preventDefault();
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(bodyData)
                 });
-
-                const mensagem = await response.text();
-
+                const msg = await response.text();
+                alert(response.ok ? "Sucesso: " + msg : "Atenção: " + msg);
                 if (response.ok) {
-                    alert("Sucesso: " + mensagem);
-                    event.target.reset(); // Limpa o formulário
-                    loadData(); // Atualiza os selects com os novos dados
-                } else {
-                    // Aqui exibe a mensagem de erro definida no main.js (ex: "País já cadastrado")
-                    alert("Atenção: " + mensagem);
+                    event.target.reset();
+                    loadData();
                 }
-            } catch (error) {
-                alert("Erro ao conectar com o servidor.");
-            }
+            } catch (error) { alert("Erro de conexão com o servidor."); }
         }
 
-        // Evento Formulário País
-        document.getElementById('formPais').addEventListener('submit', (e) => {
-            const data = { pais: document.getElementById('pais').value };
-            handleFormSubmit(e, 'http://localhost:3000/cadastrar_pais', data);
-        });
+        // Eventos de clique nos botões de cadastro
+        document.getElementById('formPais').addEventListener('submit', e => handleFormSubmit(e, 'http://localhost:3000/cadastrar_pais', { pais: document.getElementById('pais').value }));
+        document.getElementById('formCidade').addEventListener('submit', e => handleFormSubmit(e, 'http://localhost:3000/cadastrar_cidade', { cidade: document.getElementById('cidade').value, pais_cidade: document.getElementById('pais_cidade').value }));
+        document.getElementById('formEndereco').addEventListener('submit', e => handleFormSubmit(e, 'http://localhost:3000/cadastrar_endereco', { endereco: document.getElementById('endereco').value, cidade_endereco: document.getElementById('cidade_endereco').value }));
 
-        // Evento Formulário Cidade
-        document.getElementById('formCidade').addEventListener('submit', (e) => {
-            const data = { 
-                cidade: document.getElementById('cidade').value,
-                pais_cidade: document.getElementById('pais_cidade').value
-            };
-            handleFormSubmit(e, 'http://localhost:3000/cadastrar_cidade', data);
-        });
-
-        // Evento Formulário Endereço
-        document.getElementById('formEndereco').addEventListener('submit', (e) => {
-            const data = { 
-                endereco: document.getElementById('endereco').value,
-                cidade_endereco: document.getElementById('cidade_endereco').value
-            };
-            handleFormSubmit(e, 'http://localhost:3000/cadastrar_endereco', data);
-        });
-
-        // Carrega os dados iniciais
+        // Inicialização
         loadData();
-
     </script>
 </body>
 </html>

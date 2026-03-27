@@ -1,25 +1,23 @@
+const express = require('express');
+const cors = require('cors');
+
+// Importa as funções de comunicação com o banco de dados
 const {
     listarPaises, listarCidades, listarEnderecos,
     cadastrar_endereco, cadastrarPais, cadastrarCidade
 } = require('./main');
 
-const express = require('express');
-const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
+// Configurações base: permite conexão do front-end (CORS) e processamento de dados JSON
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// --- Rotas de Listagem ---
-app.get('/listarCidades', async (req, res) => {
-    try {
-        const dados = await listarCidades();
-        res.json(dados);
-    } catch (e) { res.status(500).json({ erro: e.message }); }
-});
 
+
+// ROTAS DE LEITURA (Envia dados para as tabelas)
 app.get('/listarPaises', async (req, res) => {
     try {
         const dados = await listarPaises();
@@ -27,8 +25,22 @@ app.get('/listarPaises', async (req, res) => {
     } catch (e) { res.status(500).json({ erro: e.message }); }
 });
 
-// --- Rotas de Cadastro (Agora respondendo texto limpo para o alert) ---
+app.get('/listarCidades', async (req, res) => {
+    try {
+        const dados = await listarCidades();
+        res.json(dados);
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
 
+app.get('/listarEnderecos', async (req, res) => {
+    try {
+        const dados = await listarEnderecos();
+        res.json(dados);
+    } catch (e) { res.status(500).json({ erro: e.message }); }
+});
+
+
+// ROTAS DE CADASTRO (Recebe dados dos formulários)
 app.post('/cadastrar_pais', async (req, res) => {
     try {
         await cadastrarPais(req.body.pais);
@@ -57,3 +69,4 @@ app.post('/cadastrar_endereco', async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
+

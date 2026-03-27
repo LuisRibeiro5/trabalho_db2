@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-// --- Configurações de Conexão ---
+// Configuração do Banco de Dados
 const HOST = "mysql-209830-0.cloudclusters.net";
 const USER = "admin";
 const PASSWORD = "81DvDok0";
@@ -14,8 +14,7 @@ const sequelize = new Sequelize(DATABASE, USER, PASSWORD, {
     logging: false 
 });
 
-// --- Definição dos Modelos ---
-
+// Definição dos Modelos (Tabelas)
 const Country = sequelize.define('country', {
     country_id: { type: DataTypes.SMALLINT.UNSIGNED, autoIncrement: true, primaryKey: true },
     country: { type: DataTypes.STRING(50), allowNull: false },
@@ -41,29 +40,36 @@ const Address = sequelize.define('Address', {
     last_update: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 }, { tableName: 'address', timestamps: false });
 
-// --- Relacionamentos ---
+// Relacionamentos (Chaves Estrangeiras)
 City.belongsTo(Country, { foreignKey: 'country_id' });
 Country.hasMany(City, { foreignKey: 'country_id' });
+
 Address.belongsTo(City, { foreignKey: 'city_id' });
 City.hasMany(Address, { foreignKey: 'city_id' });
 
-// --- Funções de Listagem ---
+// Funções de Listagem (Ordenadas do mais novo para o mais antigo)
 async function listarPaises() {
-    return await Country.findAll({ raw: true });
+    return await Country.findAll({ 
+        raw: true,
+        order: [['country_id', 'DESC']]
+    });
 }
 
 async function listarCidades() {
-    return await City.findAll({ include: [Country] });
+    return await City.findAll({ 
+        include: [Country],
+        order: [['city_id', 'DESC']]
+    });
 }
 
 async function listarEnderecos() {
     return await Address.findAll({
-        include: [{ model: City, include: [Country] }]
+        include: [{ model: City, include: [Country] }],
+        order: [['address_id', 'DESC']]
     });
 }
 
-// --- Funções de Inserção com findOrCreate ---
-
+// Funções de Cadastro (Evitando Duplicatas)
 async function cadastrarPais(nomePais) {
     const [pais, criado] = await Country.findOrCreate({
         where: { country: nomePais },
@@ -97,6 +103,7 @@ async function cadastrar_endereco(endereco, id_cidade) {
     return addr;
 }
 
+// Exportação de Módulos
 module.exports = {
     listarPaises, listarCidades, listarEnderecos,
     cadastrar_endereco, cadastrarPais, cadastrarCidade
